@@ -10,6 +10,7 @@ import (
 	"github.com/rakamin-fullstack-final-task/final-task-pbi-rakamin-fullstack-osvaldosilitonga/dto"
 	"github.com/rakamin-fullstack-final-task/final-task-pbi-rakamin-fullstack-osvaldosilitonga/helpers"
 	"github.com/rakamin-fullstack-final-task/final-task-pbi-rakamin-fullstack-osvaldosilitonga/repository"
+	"gorm.io/gorm"
 )
 
 type userServiceImpl struct {
@@ -50,4 +51,33 @@ func (us *userServiceImpl) AddNewUser(ctx context.Context, data *dto.UserRegiste
 	}
 
 	return user, nil
+}
+
+func (us *userServiceImpl) Login(ctx context.Context, data *dto.UserLoginRequest) (dto.UserLoginResponse, error) {
+	res := dto.UserLoginResponse{}
+
+	c, cancel := context.WithTimeout(ctx, time.Second*5)
+	defer cancel()
+
+	user, err := us.userRepo.FindByEmail(c, data.Email)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return res, errors.New("404,email not exist")
+		}
+		return res, errors.New("500,something went wrong")
+	}
+
+	// Compare password
+	if !helpers.ComparePassword(user.Password, data.Password) {
+		return res, errors.New("400,wrong password")
+	}
+
+	// Generate token
+	token, err := helpers.GenerateToken(user.ID, user.Email)
+	if err != nil {
+		return res, errors.New("500,something went wrong")
+	}
+
+	res.AccessToken = token
+	return res, nil
 }

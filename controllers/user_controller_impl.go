@@ -33,3 +33,19 @@ func (uc *userControllerImpl) Register(c *gin.Context) {
 
 	utils.Response(c, &utils.ApiCreate, res, "")
 }
+
+func (uc *userControllerImpl) Login(c *gin.Context) {
+	var req dto.UserLoginRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.Response(c, &utils.ApiBadRequest, nil, err.Error())
+		return
+	}
+
+	res, err := uc.userService.Login(c, &req)
+	if err != nil {
+		helpers.ErrorCheck(c, err)
+		return
+	}
+
+	utils.Response(c, &utils.ApiOk, res, "")
+}

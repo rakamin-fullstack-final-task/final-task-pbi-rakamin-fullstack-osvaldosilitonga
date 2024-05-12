@@ -13,6 +13,8 @@ func ErrorCheck(c *gin.Context, err error) {
 	switch errSplit[0] {
 	case "400":
 		utils.Response(c, &utils.ApiBadRequest, nil, errSplit[1])
+	case "404":
+		utils.Response(c, &utils.ApiNotFound, nil, errSplit[1])
 	default:
 		utils.Response(c, &utils.ApiInternalServer, nil, errSplit[1])
 	}

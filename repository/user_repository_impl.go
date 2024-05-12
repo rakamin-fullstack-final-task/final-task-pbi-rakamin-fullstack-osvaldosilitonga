@@ -25,3 +25,11 @@ func (ur *userRepositoryImpl) Save(ctx context.Context, user *domain.User) error
 
 	return nil
 }
+
+func (ur *userRepositoryImpl) FindByEmail(ctx context.Context, email string) (domain.User, error) {
+	user := domain.User{}
+
+	err := ur.DB.WithContext(ctx).Where("email = ?", email).First(&user).Error
+
+	return user, err
+}
