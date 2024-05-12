@@ -25,10 +25,18 @@ func (uc *userControllerImpl) Register(c *gin.Context) {
 		return
 	}
 
-	res, err := uc.userService.AddNewUser(c, &req)
+	user, err := uc.userService.AddNewUser(c, &req)
 	if err != nil {
 		helpers.ErrorCheck(c, err)
 		return
+	}
+
+	res := dto.UserRegisterResponse{
+		ID:        user.ID,
+		Username:  user.Username,
+		Email:     user.Email,
+		CreatedAt: user.CreatedAt.String(),
+		UpdatedAt: user.UpdatedAt.String(),
 	}
 
 	utils.Response(c, &utils.ApiCreate, res, "")
