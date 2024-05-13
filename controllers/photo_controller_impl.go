@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"strconv"
-
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/rakamin-fullstack-final-task/final-task-pbi-rakamin-fullstack-osvaldosilitonga/dto"
@@ -22,20 +20,13 @@ func NewPhotoController(ps service.PhotoService) PhotoController {
 }
 
 func (pc *photoControllerImpl) Upload(c *gin.Context) {
-	// TODO: Apply middleware to set userID to gin.Context
-	c.Set("id", "12") // Dummy data
-
-	userId, exist := c.Get("id")
+	id, exist := c.Get("id")
 	if !exist {
 		utils.Response(c, &utils.ApiBadRequest, nil, "user id not found")
 		return
 	}
 
-	id, err := strconv.ParseUint(userId.(string), 10, 64)
-	if err != nil {
-		utils.Response(c, &utils.ApiBadRequest, nil, "invalid user id")
-		return
-	}
+	userId := uint64(id.(float64))
 
 	var form dto.PhotoUploadFormRequest
 	if err := c.ShouldBind(&form); err != nil {
@@ -52,7 +43,7 @@ func (pc *photoControllerImpl) Upload(c *gin.Context) {
 		return
 	}
 
-	res, err := pc.photoService.Upload(c, id, &form)
+	res, err := pc.photoService.Upload(c, userId, &form)
 	if err != nil {
 		helpers.ErrorCheck(c, err)
 		return
