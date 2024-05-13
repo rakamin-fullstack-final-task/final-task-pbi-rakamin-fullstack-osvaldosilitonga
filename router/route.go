@@ -12,10 +12,13 @@ func Route(r *gin.Engine) {
 	db := database.InitDB()
 
 	userRepository := repository.NewUserRepository(db)
+	photoRepository := repository.NewPhotoRepository(db)
 
 	userService := service.NewUserService(userRepository)
+	photoService := service.NewPhotoService(photoRepository)
 
 	userController := controllers.NewUserController(userService)
+	photoController := controllers.NewPhotoController(photoService)
 
 	v1 := r.Group("/v1")
 	{
@@ -34,6 +37,14 @@ func Route(r *gin.Engine) {
 			users.POST("/login", userController.Login)
 			users.PATCH("/:id", userController.Update)
 			users.DELETE("/:id", userController.Delete)
+		}
+
+		// Set a lower memory limit for multipart forms (default is 32 MiB)
+		r.MaxMultipartMemory = 2 << 20 // 2 MiB
+
+		photos := v1.Group("/photos")
+		{
+			photos.POST("/", photoController.Upload)
 		}
 	}
 }
