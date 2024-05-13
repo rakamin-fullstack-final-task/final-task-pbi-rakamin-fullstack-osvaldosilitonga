@@ -1,6 +1,9 @@
 package controllers
 
 import (
+	"context"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 	"github.com/rakamin-fullstack-final-task/final-task-pbi-rakamin-fullstack-osvaldosilitonga/dto"
 	"github.com/rakamin-fullstack-final-task/final-task-pbi-rakamin-fullstack-osvaldosilitonga/helpers"
@@ -50,6 +53,40 @@ func (uc *userControllerImpl) Login(c *gin.Context) {
 	}
 
 	res, err := uc.userService.Login(c, &req)
+	if err != nil {
+		helpers.ErrorCheck(c, err)
+		return
+	}
+
+	utils.Response(c, &utils.ApiOk, res, "")
+}
+
+func (uc *userControllerImpl) Update(c *gin.Context) {
+	params := c.Param("id")
+	id, err := strconv.Atoi(params)
+	if err != nil {
+		utils.Response(c, &utils.ApiBadRequest, nil, "invalid params id")
+		return
+	}
+
+	var req dto.UserUpdateRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.Response(c, &utils.ApiBadRequest, nil, err.Error())
+		return
+	}
+
+	if req.Username != "" && len(req.Username) < 3 {
+		utils.Response(c, &utils.ApiBadRequest, nil, "username is to short")
+		return
+	}
+	if req.Password != "" && len(req.Password) < 6 {
+		utils.Response(c, &utils.ApiBadRequest, nil, "password is to short")
+		return
+	}
+
+	ctx := context.WithValue(c, "id", uint64(id))
+
+	res, err := uc.userService.Update(ctx, &req)
 	if err != nil {
 		helpers.ErrorCheck(c, err)
 		return

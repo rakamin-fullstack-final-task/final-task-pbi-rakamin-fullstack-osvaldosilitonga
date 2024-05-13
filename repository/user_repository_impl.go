@@ -5,6 +5,7 @@ import (
 
 	"github.com/rakamin-fullstack-final-task/final-task-pbi-rakamin-fullstack-osvaldosilitonga/domain"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type userRepositoryImpl struct {
@@ -32,4 +33,29 @@ func (ur *userRepositoryImpl) FindByEmail(ctx context.Context, email string) (do
 	err := ur.DB.WithContext(ctx).Where("email = ?", email).First(&user).Error
 
 	return user, err
+}
+
+func (ur *userRepositoryImpl) FindByID(ctx context.Context, id uint64) (*domain.User, error) {
+	user := domain.User{}
+
+	err := ur.DB.Limit(1).Where("id = ?", id).Find(&user).Error
+
+	return &user, err
+}
+
+func (ur *userRepositoryImpl) Update(ctx context.Context, id uint64, username, password string) (*domain.User, error) {
+	var user domain.User
+
+	query := map[string]any{}
+
+	if username != "" {
+		query["username"] = username
+	}
+	if password != "" {
+		query["password"] = password
+	}
+
+	err := ur.DB.Model(&user).Clauses(clause.Returning{}).Limit(1).Where("id = ?", id).Updates(query).Error
+
+	return &user, err
 }

@@ -81,3 +81,34 @@ func (us *userServiceImpl) Login(ctx context.Context, data *dto.UserLoginRequest
 	res.AccessToken = token
 	return res, nil
 }
+
+func (us *userServiceImpl) Update(ctx context.Context, data *dto.UserUpdateRequest) (*dto.UserUpdateResponse, error) {
+	var res dto.UserUpdateResponse
+
+	c, cancel := context.WithTimeout(ctx, time.Second*5)
+	defer cancel()
+
+	if data.Password != "" {
+		hash, err := helpers.HashPassword(data.Password)
+		if err != nil {
+			return &res, errors.New("500,something went wrong")
+		}
+
+		data.Password = hash
+	}
+
+	id := ctx.Value("id").(uint64)
+
+	user, err := us.userRepo.Update(c, id, data.Username, data.Password)
+	if err != nil {
+		return &res, errors.New("500,something went wrong")
+	}
+
+	res.ID = user.ID
+	res.Username = user.Username
+	res.Email = user.Email
+	res.CreatedAt = user.CreatedAt.String()
+	res.UpdatedAt = user.UpdatedAt.String()
+
+	return &res, nil
+}

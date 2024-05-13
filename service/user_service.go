@@ -10,4 +10,5 @@ import (
 type UserService interface {
 	AddNewUser(ctx context.Context, user *dto.UserRegisterRequest) (domain.User, error)
 	Login(ctx context.Context, data *dto.UserLoginRequest) (dto.UserLoginResponse, error)
+	Update(ctx context.Context, data *dto.UserUpdateRequest) (*dto.UserUpdateResponse, error)
 }

@@ -22,3 +22,16 @@ type UserLoginRequest struct {
 type UserLoginResponse struct {
 	AccessToken string `json:"access_token"`
 }
+
+type UserUpdateRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type UserUpdateResponse struct {
+	ID        uint64 `json:"id"`
+	Username  string `json:"username"`
+	Email     string `json:"email"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+}
