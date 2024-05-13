@@ -28,9 +28,12 @@ func Route(r *gin.Engine) {
 			})
 		})
 
-		v1.POST("/users/register", userController.Register)
-		v1.POST("/users/login", userController.Login)
-		v1.PATCH("/users/:id", userController.Update)
-		v1.DELETE("/users/:id", userController.Delete)
+		users := v1.Group("/users")
+		{
+			users.POST("/register", userController.Register)
+			users.POST("/login", userController.Login)
+			users.PATCH("/:id", userController.Update)
+			users.DELETE("/:id", userController.Delete)
+		}
 	}
 }
