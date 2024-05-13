@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rakamin-fullstack-final-task/final-task-pbi-rakamin-fullstack-osvaldosilitonga/controllers"
 	"github.com/rakamin-fullstack-final-task/final-task-pbi-rakamin-fullstack-osvaldosilitonga/database"
+	"github.com/rakamin-fullstack-final-task/final-task-pbi-rakamin-fullstack-osvaldosilitonga/middlewares"
 	"github.com/rakamin-fullstack-final-task/final-task-pbi-rakamin-fullstack-osvaldosilitonga/repository"
 	"github.com/rakamin-fullstack-final-task/final-task-pbi-rakamin-fullstack-osvaldosilitonga/service"
 )
@@ -43,6 +44,7 @@ func Route(r *gin.Engine) {
 		r.MaxMultipartMemory = 2 << 20 // 2 MiB
 
 		photos := v1.Group("/photos")
+		photos.Use(middlewares.Auth())
 		{
 			photos.POST("/", photoController.Upload)
 		}
