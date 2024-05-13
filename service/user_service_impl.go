@@ -112,3 +112,19 @@ func (us *userServiceImpl) Update(ctx context.Context, data *dto.UserUpdateReque
 
 	return &res, nil
 }
+
+func (us *userServiceImpl) DeleteByID(ctx context.Context, id uint64) error {
+	c, cancel := context.WithTimeout(ctx, time.Second*5)
+	defer cancel()
+
+	err := us.userRepo.DeleteByID(c, id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errors.New("404,record not found")
+		}
+
+		return errors.New("500,something went wrong")
+	}
+
+	return nil
+}

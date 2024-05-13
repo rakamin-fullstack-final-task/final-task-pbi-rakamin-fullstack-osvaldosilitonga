@@ -11,4 +11,5 @@ type UserRepository interface {
 	FindByEmail(ctx context.Context, email string) (domain.User, error)
 	FindByID(ctx context.Context, id uint64) (*domain.User, error)
 	Update(ctx context.Context, id uint64, username, password string) (*domain.User, error)
+	DeleteByID(ctx context.Context, id uint64) error
 }

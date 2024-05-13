@@ -94,3 +94,21 @@ func (uc *userControllerImpl) Update(c *gin.Context) {
 
 	utils.Response(c, &utils.ApiOk, res, "")
 }
+
+func (uc *userControllerImpl) Delete(c *gin.Context) {
+	params := c.Param("id")
+
+	id, err := strconv.ParseUint(params, 10, 64)
+	if err != nil {
+		utils.Response(c, &utils.ApiBadRequest, nil, "invalid params id")
+		return
+	}
+
+	err = uc.userService.DeleteByID(c, id)
+	if err != nil {
+		helpers.ErrorCheck(c, err)
+		return
+	}
+
+	utils.Response(c, &utils.ApiOk, nil, "")
+}

@@ -36,9 +36,9 @@ func (ur *userRepositoryImpl) FindByEmail(ctx context.Context, email string) (do
 }
 
 func (ur *userRepositoryImpl) FindByID(ctx context.Context, id uint64) (*domain.User, error) {
-	user := domain.User{}
+	user := domain.User{ID: id}
 
-	err := ur.DB.Limit(1).Where("id = ?", id).Find(&user).Error
+	err := ur.DB.First(&user).Error
 
 	return &user, err
 }
@@ -58,4 +58,14 @@ func (ur *userRepositoryImpl) Update(ctx context.Context, id uint64, username, p
 	err := ur.DB.Model(&user).Clauses(clause.Returning{}).Limit(1).Where("id = ?", id).Updates(query).Error
 
 	return &user, err
+}
+
+func (ur *userRepositoryImpl) DeleteByID(ctx context.Context, id uint64) error {
+	if _, err := ur.FindByID(ctx, id); err != nil {
+		return err
+	}
+
+	err := ur.DB.Delete(domain.User{}, id).Error
+
+	return err
 }
